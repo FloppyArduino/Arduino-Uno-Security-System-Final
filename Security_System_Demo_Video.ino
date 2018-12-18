@@ -79,7 +79,7 @@ void keypadEvent(KeypadEvent eKey){
       Serial.print(" Enter: ");
       tone(speaker,900,50);//plays beep tone on speaker when key is pressed
       Serial.println(eKey);//prints key pressed
-  }
+  
 
   switch(eKey){//switch case for the key
     case '*'://enter password button
@@ -99,6 +99,7 @@ void keypadEvent(KeypadEvent eKey){
       pass.append(eKey);
       admin.append(eKey);
   }
+ }
 }
 
 void checkPassword(){//function to check entered passwords from user
@@ -134,7 +135,14 @@ void checkPassword(){//function to check entered passwords from user
     timesUnlocked++;//adds one to times system was unlocked
     Serial.print("Admin Account:");
     lock.write(110);//moves to unlocked pos
-    
+    analogWrite(greenLED,255);
+     //unlock tone
+    tone(speaker,900,100);
+    delay(150);
+    tone(speaker,1100,100);
+    delay(150);
+    tone(speaker,1200,100);
+    delay(150);
     //loading thing animation
     Serial.print("Checking: ");
     for(int c=0;c<8;c++){
@@ -152,6 +160,7 @@ void checkPassword(){//function to check entered passwords from user
     Serial.print(incorrect);
     delay(4000);//delay 4 sec
     lock.write(10);//moves to locked pos.
+    analogWrite(greenLED,0);
     //clear / reset passwords
     tries=3;//reset tries
     pass.reset();
@@ -160,25 +169,28 @@ void checkPassword(){//function to check entered passwords from user
     Serial.println("Enter Password: ");
   }
   else{
-    tries--;//take one away from total tries
-    Serial.println("Password incorrect. Denied... Try Again ");
+    //reset passwords
+    tries--;//subtract 1 for total tries
+    Serial.println("\nPassword incorrect. Denied.");
     delay(10);
-    lock.write(10);//moves to locked pos.
-    incorrect++;//add one to times incorrect
+    lock.write(10);//make sure servo in locked pos
+    incorrect++;//adds one to times incorrect
+    //beeping loop
     for(int n=0;n<3;n++){
-      tone(speaker,400,500);//play beep
-      analogWrite(redLED,255);//turn on the red led
+      tone(speaker,400,500);
+      analogWrite(redLED,255);
       delay(500);
-      noTone(speaker);//stop all sounds
-      analogWrite(redLED,0);//turn off the red led
+      noTone(speaker);
+      analogWrite(redLED,0);
       delay(500);
     }
-
+    
     if(tries==0){
       Serial.println("Ran out of tries...Locked for 30 seconds.\n");
       //30 sec flashing loop
       for(int t=30;t>0;t--){
         Serial.print(t);
+        Serial.print(" ");
         analogWrite(redLED,255);//turn red led on
         delay(500);//delay half second
         analogWrite(redLED,0);//turn red led off
@@ -198,6 +210,3 @@ void checkPassword(){//function to check entered passwords from user
     admin.reset();
   }
 }
-
-
-
